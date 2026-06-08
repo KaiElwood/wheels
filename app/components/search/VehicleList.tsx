@@ -2,7 +2,15 @@ import type { Vehicle } from "@/server/types";
 import { Card } from "../shared/ui/card";
 import { VehicleListItem } from "./VehicleListItem";
 
-export function VehicleList({ vehicles }: { vehicles: Vehicle[] }) {
+interface VehicleListProps {
+  vehicles: Vehicle[];
+  reviewRange?: {
+    start: string;
+    end: string;
+  };
+}
+
+export function VehicleList({ reviewRange, vehicles }: VehicleListProps) {
   if (vehicles.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -16,7 +24,11 @@ export function VehicleList({ vehicles }: { vehicles: Vehicle[] }) {
   return (
     <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {vehicles.map((vehicle) => (
-        <VehicleListItem key={vehicle.id} vehicle={vehicle} />
+        <VehicleListItem
+          key={vehicle.id}
+          reviewRange={reviewRange}
+          vehicle={vehicle}
+        />
       ))}
     </ul>
   );

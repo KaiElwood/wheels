@@ -8,13 +8,33 @@ import Link from "next/link";
 import { Button } from "../shared/ui/button";
 import { Card } from "../shared/ui/card";
 
-export function VehicleListItem({ vehicle }: { vehicle: Vehicle }) {
+interface VehicleListItemProps {
+  vehicle: Vehicle;
+  reviewRange?: {
+    start: string;
+    end: string;
+  };
+}
+
+export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) {
   const imgData = useBase64Image(vehicle.thumbnail_url);
   const specs = [
     { label: "Class", value: vehicle.classification, icon: Car },
     { label: "Seats", value: vehicle.max_passengers, icon: Users },
     { label: "Doors", value: vehicle.doors, icon: DoorOpen },
   ];
+  const reviewHref = {
+    pathname: "/review",
+    query: {
+      id: vehicle.id,
+      ...(reviewRange
+        ? {
+            start: reviewRange.start,
+            end: reviewRange.end,
+          }
+        : {}),
+    },
+  };
 
   return (
     <li className="h-full">
@@ -67,7 +87,7 @@ export function VehicleListItem({ vehicle }: { vehicle: Vehicle }) {
               </span>
             </p>
             <Button asChild>
-              <Link href={`/review?id=${vehicle.id}`}>Book now</Link>
+              <Link href={reviewHref}>Book now</Link>
             </Button>
           </div>
         </div>
