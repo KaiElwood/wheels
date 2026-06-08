@@ -44,13 +44,13 @@ export function VehicleListItem({ vehicle }: { vehicle: Vehicle }) {
             {specs.map(({ label, value, icon: Icon }) => (
               <div
                 key={label}
-                className="rounded-lg border bg-background px-3 py-2"
+                className="min-w-0 rounded-lg border bg-background px-3 py-2"
               >
-                <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Icon className="h-3.5 w-3.5 text-primary" />
-                  {label}
+                <dt className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="min-w-0 truncate">{label}</span>
                 </dt>
-                <dd className="mt-1 text-sm font-semibold text-foreground">
+                <dd className="mt-1 min-w-0 break-words text-sm font-semibold text-foreground">
                   {value}
                 </dd>
               </div>

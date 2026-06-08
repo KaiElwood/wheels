@@ -18,7 +18,7 @@ export function VehicleDetails({ vehicle }: VehicleDetailsProps) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="grid gap-0 md:grid-cols-[minmax(0,320px)_1fr]">
+      <div className="grid gap-0 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         <div className="aspect-[4/3] bg-muted md:aspect-auto">
           {imgData ? (
             <img
@@ -30,26 +30,26 @@ export function VehicleDetails({ vehicle }: VehicleDetailsProps) {
             <div className="h-full w-full animate-pulse bg-muted" />
           )}
         </div>
-        <div className="space-y-6 p-6">
+        <div className="min-w-0 space-y-6 p-6">
           <div className="space-y-2">
             <p className="text-sm font-medium text-primary">
               {vehicle.classification}
             </p>
-            <h2 className="text-2xl font-semibold text-foreground">
+            <h2 className="break-words text-2xl font-semibold text-foreground">
               {vehicle.make} {vehicle.model}
             </h2>
           </div>
-          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-3">
             {specs.map(({ label, value, icon: Icon }) => (
               <div
                 key={label}
-                className="rounded-lg border bg-background px-3 py-3"
+                className="min-w-0 rounded-lg border bg-background px-3 py-3"
               >
-                <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Icon className="h-3.5 w-3.5 text-primary" />
-                  {label}
+                <dt className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="min-w-0 truncate">{label}</span>
                 </dt>
-                <dd className="mt-1 text-sm font-semibold text-foreground">
+                <dd className="mt-1 min-w-0 break-words text-sm font-semibold text-foreground">
                   {value}
                 </dd>
               </div>
