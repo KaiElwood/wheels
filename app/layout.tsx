@@ -1,4 +1,10 @@
 import "./index.css";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kaizen Wheels",
+  description: "Find and reserve the right car for your next trip.",
+};
 
 export default function RootLayout({
   children,
@@ -7,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen bg-background text-foreground">
+        {children}
+      </body>
     </html>
   );
 }
