@@ -70,7 +70,11 @@ export function SearchPage({
           <ErrorBoundary
             fallback={<ErrorFallback message="Failed to load vehicles" />}
           >
-            <VehicleList reviewRange={reviewRange} vehicles={vehicles} />
+            <VehicleList
+              reviewRange={reviewRange}
+              searchFilters={filters}
+              vehicles={vehicles}
+            />
           </ErrorBoundary>
         </section>
       </div>

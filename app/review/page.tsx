@@ -10,6 +10,28 @@ function getParam(params: SearchParams, key: string) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function getSearchHref(params: SearchParams) {
+  const query = new URLSearchParams();
+  const start = getParam(params, "start");
+  const end = getParam(params, "end");
+  const pickup = getParam(params, "pickup") ?? start;
+  const dropoff = getParam(params, "dropoff") ?? end;
+
+  [
+    ["pickup", pickup],
+    ["dropoff", dropoff],
+    ["passengers", getParam(params, "passengers")],
+    ["class", getParam(params, "class")],
+    ["price", getParam(params, "price")],
+  ].forEach(([key, value]) => {
+    if (value) {
+      query.set(key, value);
+    }
+  });
+
+  return query.size > 0 ? `/?${query.toString()}` : "/";
+}
+
 export default async function ReviewRoute({
   searchParams,
 }: {
@@ -19,6 +41,7 @@ export default async function ReviewRoute({
   const id = getParam(params, "id");
   const start = getParam(params, "start");
   const end = getParam(params, "end");
+  const searchHref = getSearchHref(params);
 
   if (!id) {
     throw new Error("No reservation ID found");
@@ -34,5 +57,13 @@ export default async function ReviewRoute({
         })
       : undefined;
 
-  return <ReviewPage vehicle={vehicle} start={start} end={end} quote={quote} />;
+  return (
+    <ReviewPage
+      searchHref={searchHref}
+      vehicle={vehicle}
+      start={start}
+      end={end}
+      quote={quote}
+    />
+  );
 }

@@ -1,8 +1,9 @@
-import type { VehicleSearchResult } from "@/server/types";
+import type { SearchFilterState, VehicleSearchResult } from "@/server/types";
 import { Card } from "../shared/ui/card";
 import { VehicleListItem } from "./VehicleListItem";
 
 interface VehicleListProps {
+  searchFilters: SearchFilterState;
   vehicles: VehicleSearchResult[];
   reviewRange?: {
     start: string;
@@ -10,7 +11,11 @@ interface VehicleListProps {
   };
 }
 
-export function VehicleList({ reviewRange, vehicles }: VehicleListProps) {
+export function VehicleList({
+  reviewRange,
+  searchFilters,
+  vehicles,
+}: VehicleListProps) {
   if (vehicles.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -27,6 +32,7 @@ export function VehicleList({ reviewRange, vehicles }: VehicleListProps) {
         <VehicleListItem
           key={vehicle.id}
           reviewRange={reviewRange}
+          searchFilters={searchFilters}
           vehicle={vehicle}
         />
       ))}

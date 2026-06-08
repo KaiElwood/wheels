@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCents } from "@/lib/formatters";
-import type { VehicleSearchResult } from "@/server/types";
+import type { SearchFilterState, VehicleSearchResult } from "@/server/types";
 import { useBase64Image } from "@/util/useBase64Image";
 import { BadgePercent, Car, DoorOpen, Users } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { Button } from "../shared/ui/button";
 import { Card } from "../shared/ui/card";
 
 interface VehicleListItemProps {
+  searchFilters: SearchFilterState;
   vehicle: VehicleSearchResult;
   reviewRange?: {
     start: string;
@@ -16,7 +17,11 @@ interface VehicleListItemProps {
   };
 }
 
-export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) {
+export function VehicleListItem({
+  reviewRange,
+  searchFilters,
+  vehicle,
+}: VehicleListItemProps) {
   const imgData = useBase64Image(vehicle.thumbnail_url);
   const quote = vehicle.quote;
   const discount = quote?.discount;
@@ -29,6 +34,11 @@ export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) 
     pathname: "/review",
     query: {
       id: vehicle.id,
+      pickup: searchFilters.pickup || undefined,
+      dropoff: searchFilters.dropoff || undefined,
+      passengers: searchFilters.passengers,
+      class: searchFilters.class,
+      price: searchFilters.price,
       ...(reviewRange
         ? {
             start: reviewRange.start,

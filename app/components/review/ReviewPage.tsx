@@ -234,11 +234,13 @@ function PriceBreakdown({
   hourlyRateCents,
   duration,
   quote,
+  searchHref,
 }: {
   addOnLineItems: AddOnLineItem[];
   hourlyRateCents: number;
   duration?: string;
   quote?: Quote;
+  searchHref: string;
 }) {
   const addOnTotalPriceCents = addOnLineItems.reduce(
     (total, item) => total + item.totalPriceCents,
@@ -328,7 +330,7 @@ function PriceBreakdown({
           Confirm reservation
         </Button>
         <Button asChild variant="outline" className="w-full">
-          <Link href="/">Back to search</Link>
+          <Link href={searchHref}>Back to search</Link>
         </Button>
       </div>
     </Card>
@@ -340,11 +342,13 @@ function Content({
   start,
   end,
   quote,
+  searchHref,
 }: {
   vehicle: Vehicle;
   start?: string;
   end?: string;
   quote?: Quote;
+  searchHref: string;
 }) {
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([]);
   const selectedAddOns = useMemo(
@@ -383,6 +387,7 @@ function Content({
         <PriceBreakdown
           addOnLineItems={addOnLineItems}
           hourlyRateCents={vehicle.hourly_rate_cents}
+          searchHref={searchHref}
         />
       </div>
     );
@@ -419,6 +424,7 @@ function Content({
         hourlyRateCents={vehicle.hourly_rate_cents}
         duration={formattedDuration}
         quote={quote}
+        searchHref={searchHref}
       />
     </div>
   );
@@ -429,11 +435,13 @@ export function ReviewPage({
   start,
   end,
   quote,
+  searchHref,
 }: {
   vehicle: Vehicle;
   start?: string;
   end?: string;
   quote?: Quote;
+  searchHref: string;
 }) {
   return (
     <MiniPageLayout
@@ -443,7 +451,13 @@ export function ReviewPage({
       <ErrorBoundary
         fallback={<ErrorFallback message="Failed to load reservation" />}
       >
-        <Content vehicle={vehicle} start={start} end={end} quote={quote} />
+        <Content
+          searchHref={searchHref}
+          vehicle={vehicle}
+          start={start}
+          end={end}
+          quote={quote}
+        />
       </ErrorBoundary>
     </MiniPageLayout>
   );
