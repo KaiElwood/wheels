@@ -22,4 +22,10 @@ Availability uses the standard interval overlap rule: a vehicle is unavailable w
 
 Something to add in the future could be helpful filters like gas mileage. I just didn't really have the time to do that this time around.
 
+## Part 4: Discounts
 
+I modeled discounts as quote-time rules. The quote object includes the base rental total, discounted total, effective hourly rate, and an optional applied discount with the label and amount saved.
+
+Holiday discounts use the provided dates as recurring month/day holidays. When both rules qualify, the server calculates both totals and returns only the better discount.
+
+Search and review both use the same server-side quote calculator, so the discount shown on result cards matches the checkout price breakdown.
