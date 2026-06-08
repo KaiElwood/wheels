@@ -58,6 +58,21 @@
 - `npm run db:seed` reloads the starter vehicles and reservations.
 - `npm run db:studio` opens Prisma Studio for inspecting local data.
 
+### Search filters
+
+The search page reads filters from URL query params so filtered searches can be
+shared or refreshed:
+
+- `pickup` and `dropoff` use local date-time strings from the UI, e.g.
+  `2026-06-12T09:00`.
+- `passengers` supports `2`, `5`, or `7`.
+- `class` supports the seeded vehicle classes, e.g. `SUV` or `Compact`.
+- `price` supports `under-50`, `under-75`, and `under-125`.
+
+When both `pickup` and `dropoff` are present and valid, search excludes vehicles
+with overlapping reservations. The pickup/dropoff calendars show fleet
+availability by day using the current reservation data.
+
 ## Project requirements
 
 This is Kaizen Wheels: the start of a car rental app. The design is unfinished, there's no filtering, and all data lives in memory. You will harden it across five areas. Parts 1 and 2 are cross-cutting concerns that touch the whole app; Parts 3, 4, and 5 are functional features.
