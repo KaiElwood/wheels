@@ -101,7 +101,13 @@ async function searchVehicles(input: SearchVehicleInput = {}) {
 }
 
 async function getAvailabilityCalendar(
-  input: { startDate?: string; days?: number } = {},
+  input: {
+    startDate?: string;
+    days?: number;
+    passengers?: number;
+    classification?: SearchVehicleInput["classification"];
+    maxHourlyRateCents?: number;
+  } = {},
 ) {
   const requestedStart = input.startDate
     ? DateTime.fromISO(input.startDate)
@@ -118,6 +124,11 @@ async function getAvailabilityCalendar(
   return getAvailabilityCalendarData({
     startDate: startDate.toJSDate(),
     days,
+    filters: {
+      passengers: input.passengers,
+      classification: input.classification,
+      maxHourlyRateCents: input.maxHourlyRateCents,
+    },
   });
 }
 

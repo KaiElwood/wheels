@@ -79,10 +79,14 @@ export default async function Home({
 }) {
   const params = await searchParams;
   const filters = getSearchFilters(params);
+  const searchInput = toSearchInput(filters);
   const [{ vehicles }, availability] = await Promise.all([
-    API.searchVehicles(toSearchInput(filters)),
+    API.searchVehicles(searchInput),
     API.getAvailabilityCalendar({
       startDate: filters.pickup || undefined,
+      passengers: searchInput.passengers,
+      classification: searchInput.classification,
+      maxHourlyRateCents: searchInput.maxHourlyRateCents,
     }),
   ]);
 

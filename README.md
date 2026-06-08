@@ -70,8 +70,9 @@ shared or refreshed:
 - `price` supports `under-50`, `under-75`, and `under-125`.
 
 When both `pickup` and `dropoff` are present and valid, search excludes vehicles
-with overlapping reservations. The pickup/dropoff calendars show fleet
-availability by day using the current reservation data.
+with overlapping reservations. The pickup/dropoff calendars show whether at
+least one vehicle matching the passenger, class, and price filters is available
+on each day.
 
 ## Project requirements
 

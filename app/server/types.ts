@@ -54,7 +54,7 @@ export interface SearchVehicleInput {
   maxHourlyRateCents?: number;
 }
 
-export type AvailabilityStatus = "available" | "limited" | "unavailable";
+export type AvailabilityStatus = "available" | "unavailable";
 
 export interface AvailabilityDay {
   date: string;

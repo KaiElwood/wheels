@@ -152,10 +152,6 @@ function AvailabilityLegend() {
         Available
       </span>
       <span className="inline-flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-amber-500" />
-        Limited
-      </span>
-      <span className="inline-flex items-center gap-2">
         <span className="h-2 w-2 rounded-full bg-muted-foreground" />
         Unavailable
       </span>
@@ -168,7 +164,6 @@ function DatePickerField({
   date,
   time,
   availabilityByDate,
-  limitedDates,
   unavailableDates,
   onDateChange,
   onTimeChange,
@@ -177,7 +172,6 @@ function DatePickerField({
   date: Date | undefined;
   time: string;
   availabilityByDate: Map<string, AvailabilityDay>;
-  limitedDates: Date[];
   unavailableDates: Date[];
   onDateChange: (date: Date | undefined) => void;
   onTimeChange: (time: string) => void;
@@ -217,19 +211,18 @@ function DatePickerField({
               "unavailable"
             }
             modifiers={{
-              limited: limitedDates,
               unavailable: unavailableDates,
             }}
             modifiersClassNames={{
-              limited:
-                "relative after:absolute after:bottom-1 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-amber-500",
               unavailable: "line-through",
             }}
           />
           <div className="border-t px-3 py-2 text-xs text-muted-foreground">
             {selectedAvailability
-              ? `${selectedAvailability.availableVehicleCount} of ${selectedAvailability.totalVehicleCount} vehicles available`
-              : "No reservations on this day"}
+              ? selectedAvailability.status === "available"
+                ? "Available"
+                : "Unavailable"
+              : "Availability not loaded"}
           </div>
         </PopoverContent>
       </Popover>
@@ -279,14 +272,6 @@ export function SearchFilters({
     () => new Map(availability.map((day) => [day.date, day])),
     [availability],
   );
-  const limitedDates = useMemo(
-    () =>
-      availability
-        .filter((day) => day.status === "limited")
-        .map((day) => parseDateKey(day.date))
-        .filter((date): date is Date => Boolean(date)),
-    [availability],
-  );
   const unavailableDates = useMemo(
     () =>
       availability
@@ -317,7 +302,6 @@ export function SearchFilters({
             date={pickupDate}
             time={pickupTime}
             availabilityByDate={availabilityByDate}
-            limitedDates={limitedDates}
             unavailableDates={unavailableDates}
             onDateChange={setPickupDate}
             onTimeChange={setPickupTime}
@@ -330,7 +314,6 @@ export function SearchFilters({
             date={dropoffDate}
             time={dropoffTime}
             availabilityByDate={availabilityByDate}
-            limitedDates={limitedDates}
             unavailableDates={unavailableDates}
             onDateChange={setDropoffDate}
             onTimeChange={setDropoffTime}
