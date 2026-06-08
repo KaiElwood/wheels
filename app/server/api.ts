@@ -2,11 +2,15 @@ import "server-only";
 
 import { DateTime } from "luxon";
 import {
+  getAvailabilityCalendar as getAvailabilityCalendarData,
   getReservationById,
   getVehicleById,
   getVehicles,
 } from "./data_helpers";
-import type { Quote } from "./types";
+import type { Quote, SearchVehicleInput } from "./types";
+
+const DEFAULT_AVAILABILITY_DAYS = 90;
+const MAX_AVAILABILITY_DAYS = 180;
 
 const parseAndValidateTimeRange = (startTime: string, endTime: string) => {
   const start = DateTime.fromISO(startTime);
@@ -52,6 +56,21 @@ const validateReservationTimeRange = (input: {
   return { vehicleId, start, end };
 };
 
+const parseSearchTimeRange = (pickup?: string, dropoff?: string) => {
+  if (!pickup || !dropoff) {
+    return undefined;
+  }
+
+  const start = DateTime.fromISO(pickup);
+  const end = DateTime.fromISO(dropoff);
+
+  if (!start.isValid || !end.isValid || end <= start) {
+    return undefined;
+  }
+
+  return { start, end };
+};
+
 async function validateReservationAndGetVehicle(input: {
   vehicleId: string;
   startTime: string;
@@ -67,10 +86,39 @@ async function validateReservationAndGetVehicle(input: {
   return { vehicle, start, end };
 }
 
-async function searchVehicles() {
+async function searchVehicles(input: SearchVehicleInput = {}) {
+  const timeRange = parseSearchTimeRange(input.pickup, input.dropoff);
+
   return {
-    vehicles: await getVehicles(),
+    vehicles: await getVehicles({
+      startTime: timeRange?.start.toJSDate(),
+      endTime: timeRange?.end.toJSDate(),
+      passengers: input.passengers,
+      classification: input.classification,
+      maxHourlyRateCents: input.maxHourlyRateCents,
+    }),
   };
+}
+
+async function getAvailabilityCalendar(
+  input: { startDate?: string; days?: number } = {},
+) {
+  const requestedStart = input.startDate
+    ? DateTime.fromISO(input.startDate)
+    : undefined;
+  const startDate =
+    requestedStart?.isValid === true
+      ? requestedStart.startOf("day")
+      : DateTime.local().startOf("day");
+  const days = Math.min(
+    Math.max(input.days ?? DEFAULT_AVAILABILITY_DAYS, 1),
+    MAX_AVAILABILITY_DAYS,
+  );
+
+  return getAvailabilityCalendarData({
+    startDate: startDate.toJSDate(),
+    days,
+  });
 }
 
 async function getVehicle(id: string) {
@@ -102,6 +150,7 @@ async function getQuote(input: {
 
 export const API = {
   searchVehicles,
+  getAvailabilityCalendar,
   getVehicle,
   getReservation,
   getQuote,

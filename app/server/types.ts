@@ -31,3 +31,34 @@ export interface Quote {
   hourlyRateCents: number;
   durationInHours: number;
 }
+
+export type PriceFilter = "all" | "under-50" | "under-75" | "under-125";
+
+export type VehicleClassFilter = Classification | "all";
+
+export type PassengerFilter = "any" | "2" | "5" | "7";
+
+export interface SearchFilterState {
+  pickup: string;
+  dropoff: string;
+  passengers: PassengerFilter;
+  class: VehicleClassFilter;
+  price: PriceFilter;
+}
+
+export interface SearchVehicleInput {
+  pickup?: string;
+  dropoff?: string;
+  passengers?: number;
+  classification?: Classification;
+  maxHourlyRateCents?: number;
+}
+
+export type AvailabilityStatus = "available" | "limited" | "unavailable";
+
+export interface AvailabilityDay {
+  date: string;
+  availableVehicleCount: number;
+  totalVehicleCount: number;
+  status: AvailabilityStatus;
+}

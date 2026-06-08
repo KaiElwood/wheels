@@ -1,11 +1,31 @@
 import "server-only";
 
 import type {
+  Prisma,
   Reservation as PrismaReservation,
   Vehicle as PrismaVehicle,
 } from "@prisma/client";
+import { DateTime } from "luxon";
 import { getDb } from "./db";
-import type { Reservation, Vehicle } from "./types";
+import type {
+  AvailabilityDay,
+  Classification,
+  Reservation,
+  Vehicle,
+} from "./types";
+
+interface VehicleQueryFilters {
+  startTime?: Date;
+  endTime?: Date;
+  passengers?: number;
+  classification?: Classification;
+  maxHourlyRateCents?: number;
+}
+
+interface AvailabilityCalendarInput {
+  startDate: Date;
+  days: number;
+}
 
 function toVehicleDto(vehicle: PrismaVehicle): Vehicle {
   return {
@@ -49,10 +69,95 @@ export const getReservationById = async (
   return reservation ? toReservationDto(reservation) : null;
 };
 
-export const getVehicles = async (): Promise<Vehicle[]> => {
+export const getVehicles = async (
+  filters: VehicleQueryFilters = {},
+): Promise<Vehicle[]> => {
+  const where: Prisma.VehicleWhereInput = {};
+
+  if (filters.passengers) {
+    where.maxPassengers = { gte: filters.passengers };
+  }
+
+  if (filters.classification) {
+    where.classification = filters.classification;
+  }
+
+  if (filters.maxHourlyRateCents) {
+    where.hourlyRateCents = { lte: filters.maxHourlyRateCents };
+  }
+
+  if (filters.startTime && filters.endTime) {
+    where.reservations = {
+      none: {
+        startTime: { lt: filters.endTime },
+        endTime: { gt: filters.startTime },
+      },
+    };
+  }
+
   const vehicles = await getDb().vehicle.findMany({
+    where,
     orderBy: { displayOrder: "asc" },
   });
 
   return vehicles.map(toVehicleDto);
+};
+
+export const getAvailabilityCalendar = async ({
+  startDate,
+  days,
+}: AvailabilityCalendarInput): Promise<AvailabilityDay[]> => {
+  const calendarStart = DateTime.fromJSDate(startDate).startOf("day");
+  const calendarEnd = calendarStart.plus({ days });
+  const db = getDb();
+
+  const [totalVehicleCount, reservations] = await Promise.all([
+    db.vehicle.count(),
+    db.reservation.findMany({
+      where: {
+        startTime: { lt: calendarEnd.toJSDate() },
+        endTime: { gt: calendarStart.toJSDate() },
+      },
+      select: {
+        vehicleId: true,
+        startTime: true,
+        endTime: true,
+      },
+    }),
+  ]);
+
+  return Array.from({ length: days }, (_, index) => {
+    const dayStart = calendarStart.plus({ days: index });
+    const dayEnd = dayStart.plus({ days: 1 });
+    const reservedVehicleIds = new Set<string>();
+
+    reservations.forEach((reservation) => {
+      const startsBeforeDayEnds =
+        DateTime.fromJSDate(reservation.startTime) < dayEnd;
+      const endsAfterDayStarts =
+        DateTime.fromJSDate(reservation.endTime) > dayStart;
+
+      if (startsBeforeDayEnds && endsAfterDayStarts) {
+        reservedVehicleIds.add(reservation.vehicleId);
+      }
+    });
+
+    const availableVehicleCount = Math.max(
+      totalVehicleCount - reservedVehicleIds.size,
+      0,
+    );
+    const status =
+      availableVehicleCount === 0
+        ? "unavailable"
+        : availableVehicleCount < totalVehicleCount
+          ? "limited"
+          : "available";
+
+    return {
+      date: dayStart.toISODate() ?? "",
+      availableVehicleCount,
+      totalVehicleCount,
+      status,
+    };
+  });
 };
