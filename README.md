@@ -29,6 +29,8 @@
 
    To use Supabase, Neon, or another hosted Postgres database later, replace
    `DATABASE_URL` with that provider's pooled or direct connection string.
+   Restart `npm run dev` after changing `.env` values so Next.js picks up the
+   new database URL.
 
 3. Start Postgres:
 
