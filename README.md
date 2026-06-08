@@ -1,5 +1,61 @@
 <img src="public/logo.svg" alt="Kaizen Logo" width="64" style="background: #666; padding: 0.25rem; border-radius: 100%; margin-bottom: 1rem;" />
 
+## Local development
+
+### Prerequisites
+
+- Node.js 20+
+- Docker Desktop or another Docker Compose-compatible runtime
+
+### Setup
+
+1. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+2. Create a local environment file:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+   The default `DATABASE_URL` points at the Docker Postgres service:
+
+   ```txt
+   postgresql://kaizen:kaizen@localhost:5432/kaizen_wheels?schema=public
+   ```
+
+   To use Supabase, Neon, or another hosted Postgres database later, replace
+   `DATABASE_URL` with that provider's pooled or direct connection string.
+
+3. Start Postgres:
+
+   ```sh
+   docker compose up -d postgres
+   ```
+
+4. Apply migrations and seed the database:
+
+   ```sh
+   npm run db:migrate
+   npm run db:seed
+   ```
+
+5. Start the app:
+
+   ```sh
+   npm run dev
+   ```
+
+### Database commands
+
+- `npm run db:generate` regenerates Prisma Client.
+- `npm run db:migrate` applies local migrations with Prisma Migrate.
+- `npm run db:seed` reloads the starter vehicles and reservations.
+- `npm run db:studio` opens Prisma Studio for inspecting local data.
+
 ## Project requirements
 
 This is Kaizen Wheels: the start of a car rental app. The design is unfinished, there's no filtering, and all data lives in memory. You will harden it across five areas. Parts 1 and 2 are cross-cutting concerns that touch the whole app; Parts 3, 4, and 5 are functional features.
