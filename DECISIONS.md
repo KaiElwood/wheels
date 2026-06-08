@@ -29,3 +29,11 @@ I modeled discounts as quote-time rules. The quote object includes the base rent
 Holiday discounts use the provided dates as recurring month/day holidays. When both rules qualify, the server calculates both totals and returns only the better discount.
 
 Search and review both use the same server-side quote calculator, so the discount shown on result cards matches the checkout price breakdown.
+
+## Part 5: Optional add-ons
+
+I modeled add-ons with a small extensible shape: `id`, `name`, `description`, `priceCents`, and `priceModel`, where `priceModel` is either `per_rental` or `per_day`. That keeps the pricing logic generic enough that adding another add-on is just adding another object with the right price model.
+
+Selections live in client state on the review page because the prompt does not require persistence. The price breakdown calculates line items live and adds them after the discounted base rental, so discounts only affect the vehicle rental and not add-ons.
+
+For per-day add-ons, I charge `ceil(durationHours / 24)` days. That is simple, predictable, and avoids undercharging partial-day trips. With more time, I would ask the business whether add-ons should be based on calendar days, rental periods, or exact 24-hour blocks, and I would move add-ons into the database if admins needed to change them without a deploy.
