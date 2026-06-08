@@ -13,6 +13,7 @@ dist-ssr
 .env
 *.local
 *.tsbuildinfo
+AI_LOG.md
 
 .next
 
