@@ -1,4 +1,5 @@
 import { API } from "@/server/api";
+import { Card } from "../shared/ui/card";
 import { VehicleListItem } from "./VehicleListItem";
 
 export function VehicleList() {
@@ -6,14 +7,16 @@ export function VehicleList() {
 
   if (searchResponse.vehicles.length === 0) {
     return (
-      <div>
-        <p>No vehicles found.</p>
-      </div>
+      <Card className="p-8 text-center">
+        <p className="text-sm font-medium text-muted-foreground">
+          No vehicles found.
+        </p>
+      </Card>
     );
   }
 
   return (
-    <ul>
+    <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {searchResponse.vehicles.map((vehicle) => (
         <VehicleListItem key={vehicle.id} vehicle={vehicle} />
       ))}
