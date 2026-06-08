@@ -27,9 +27,25 @@ export interface Reservation {
 }
 
 export interface Quote {
+  baseTotalPriceCents: number;
   totalPriceCents: number;
   hourlyRateCents: number;
+  effectiveHourlyRateCents: number;
   durationInHours: number;
+  discount?: AppliedDiscount;
+}
+
+export type DiscountType = "holiday" | "long_rental";
+
+export interface AppliedDiscount {
+  type: DiscountType;
+  label: string;
+  badgeLabel: string;
+  amountOffCents: number;
+}
+
+export interface VehicleSearchResult extends Vehicle {
+  quote?: Quote;
 }
 
 export type PriceFilter = "all" | "under-50" | "under-75" | "under-125";

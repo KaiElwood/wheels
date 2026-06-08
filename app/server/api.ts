@@ -1,13 +1,14 @@
 import "server-only";
 
 import { DateTime } from "luxon";
+import { calculateQuote } from "./discounts";
 import {
   getAvailabilityCalendar as getAvailabilityCalendarData,
   getReservationById,
   getVehicleById,
   getVehicles,
 } from "./data_helpers";
-import type { Quote, SearchVehicleInput } from "./types";
+import type { SearchVehicleInput, VehicleSearchResult } from "./types";
 
 const DEFAULT_AVAILABILITY_DAYS = 90;
 const MAX_AVAILABILITY_DAYS = 180;
@@ -29,20 +30,6 @@ const parseAndValidateTimeRange = (startTime: string, endTime: string) => {
     throw new Error("BAD REQUEST: end_time must be after start_time");
   }
   return { start, end };
-};
-
-const calculateTotalPrice = (
-  start: DateTime,
-  end: DateTime,
-  hourlyRateCents: number,
-): Quote => {
-  const durationInHours = end.diff(start, "hours").hours || 0;
-
-  return {
-    totalPriceCents: hourlyRateCents * durationInHours,
-    hourlyRateCents,
-    durationInHours,
-  };
 };
 
 const validateReservationTimeRange = (input: {
@@ -88,15 +75,26 @@ async function validateReservationAndGetVehicle(input: {
 
 async function searchVehicles(input: SearchVehicleInput = {}) {
   const timeRange = parseSearchTimeRange(input.pickup, input.dropoff);
+  const vehicles = await getVehicles({
+    startTime: timeRange?.start.toJSDate(),
+    endTime: timeRange?.end.toJSDate(),
+    passengers: input.passengers,
+    classification: input.classification,
+    maxHourlyRateCents: input.maxHourlyRateCents,
+  });
+  const vehiclesWithQuotes: VehicleSearchResult[] = timeRange
+    ? vehicles.map((vehicle) => ({
+        ...vehicle,
+        quote: calculateQuote(
+          timeRange.start,
+          timeRange.end,
+          vehicle.hourly_rate_cents,
+        ),
+      }))
+    : vehicles;
 
   return {
-    vehicles: await getVehicles({
-      startTime: timeRange?.start.toJSDate(),
-      endTime: timeRange?.end.toJSDate(),
-      passengers: input.passengers,
-      classification: input.classification,
-      maxHourlyRateCents: input.maxHourlyRateCents,
-    }),
+    vehicles: vehiclesWithQuotes,
   };
 }
 
@@ -156,7 +154,7 @@ async function getQuote(input: {
   endTime: string;
 }) {
   const { vehicle, start, end } = await validateReservationAndGetVehicle(input);
-  return calculateTotalPrice(start, end, vehicle.hourly_rate_cents);
+  return calculateQuote(start, end, vehicle.hourly_rate_cents);
 }
 
 export const API = {
