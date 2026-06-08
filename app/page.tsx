@@ -40,14 +40,31 @@ function getParam(params: SearchParams, key: string) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function normalizeHourlyDateTime(value: string | undefined) {
+  const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2})/);
+
+  if (!match) {
+    return "";
+  }
+
+  const [, year, month, day, hour] = match;
+  const hourNumber = Number(hour);
+
+  if (hourNumber < 0 || hourNumber > 23) {
+    return "";
+  }
+
+  return `${year}-${month}-${day}T${hour}:00`;
+}
+
 function getSearchFilters(params: SearchParams): SearchFilterState {
   const passengerParam = getParam(params, "passengers");
   const classParam = getParam(params, "class");
   const priceParam = getParam(params, "price");
 
   return {
-    pickup: getParam(params, "pickup") ?? "",
-    dropoff: getParam(params, "dropoff") ?? "",
+    pickup: normalizeHourlyDateTime(getParam(params, "pickup")),
+    dropoff: normalizeHourlyDateTime(getParam(params, "dropoff")),
     passengers: PASSENGER_FILTERS.includes(passengerParam as PassengerFilter)
       ? (passengerParam as PassengerFilter)
       : "any",

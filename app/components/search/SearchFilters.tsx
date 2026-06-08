@@ -3,7 +3,6 @@
 import { Button } from "@/components/shared/ui/button";
 import { Calendar } from "@/components/shared/ui/calendar";
 import { Card } from "@/components/shared/ui/card";
-import { Input } from "@/components/shared/ui/input";
 import { Label } from "@/components/shared/ui/label";
 import {
   Popover,
@@ -36,7 +35,16 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-const DEFAULT_TIME = "09:00";
+const DEFAULT_TIME = "09";
+
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => {
+  const date = new Date(2000, 0, 1, hour);
+
+  return {
+    value: String(hour).padStart(2, "0"),
+    label: format(date, "h a"),
+  };
+});
 
 const PASSENGER_OPTIONS: Array<{ value: PassengerFilter; label: string }> = [
   { value: "any", label: "Any" },
@@ -87,13 +95,20 @@ function parseLocalDateTime(value: string) {
     return undefined;
   }
 
-  const [, year, month, day, hour, minute] = match;
+  const [, year, month, day, hour] = match;
+  const hourNumber = Number(hour);
+
+  if (hourNumber < 0 || hourNumber > 23) {
+    return undefined;
+  }
+
+  const hourValue = String(hourNumber).padStart(2, "0");
   const dateTime = new Date(
     Number(year),
     Number(month) - 1,
     Number(day),
-    Number(hour),
-    Number(minute),
+    hourNumber,
+    0,
   );
 
   if (Number.isNaN(dateTime.getTime())) {
@@ -103,7 +118,7 @@ function parseLocalDateTime(value: string) {
   return {
     date: new Date(Number(year), Number(month) - 1, Number(day)),
     dateTime,
-    time: `${hour}:${minute}`,
+    time: hourValue,
   };
 }
 
@@ -112,7 +127,7 @@ function combineLocalDateTime(date: Date | undefined, time: string) {
     return "";
   }
 
-  return `${formatDateKey(date)}T${time}`;
+  return `${formatDateKey(date)}T${time}:00`;
 }
 
 export function getReviewRange(filters: SearchFilterState) {
@@ -226,16 +241,21 @@ function DatePickerField({
           </div>
         </PopoverContent>
       </Popover>
-      <div className="relative">
-        <Clock3 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
-        <Input
-          aria-label={`${label} time`}
-          className="pl-9"
-          type="time"
-          value={time}
-          onChange={(event) => onTimeChange(event.target.value)}
-        />
-      </div>
+      <Select value={time} onValueChange={onTimeChange}>
+        <SelectTrigger aria-label={`${label} hour`}>
+          <span className="flex min-w-0 items-center gap-2">
+            <Clock3 className="h-4 w-4 shrink-0 text-primary" />
+            <SelectValue />
+          </span>
+        </SelectTrigger>
+        <SelectContent>
+          {HOUR_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

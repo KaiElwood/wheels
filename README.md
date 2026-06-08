@@ -64,7 +64,7 @@ The search page reads filters from URL query params so filtered searches can be
 shared or refreshed:
 
 - `pickup` and `dropoff` use local date-time strings from the UI, e.g.
-  `2026-06-12T09:00`.
+  `2026-06-12T09:00`. Times are selected on the hour.
 - `passengers` supports `2`, `5`, or `7`.
 - `class` supports the seeded vehicle classes, e.g. `SUV` or `Compact`.
 - `price` supports `under-50`, `under-75`, and `under-125`.
