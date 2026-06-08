@@ -1,4 +1,6 @@
-import type { Vehicle } from "@/server/data";
+"use client";
+
+import type { Vehicle } from "@/server/types";
 import { useBase64Image } from "@/util/useBase64Image";
 import { Car, DoorOpen, Users } from "lucide-react";
 import { Card } from "../shared/ui/card";

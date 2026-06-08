@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/shared/ui/checkbox";
 import { Label } from "@/components/shared/ui/label";
 import { Separator } from "@/components/shared/ui/separator";
 import { formatCents } from "@/lib/formatters";
-import { API } from "@/server/api";
+import type { Quote, Vehicle } from "@/server/types";
 import { format, formatDuration, intervalToDuration } from "date-fns";
 import {
   Baby,
@@ -21,8 +21,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MiniPageLayout } from "../shared/MiniPageLayout";
 
@@ -226,18 +224,17 @@ function PriceBreakdown({
   );
 }
 
-function Content() {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const start = searchParams.get("start");
-  const end = searchParams.get("end");
-
-  if (!id) {
-    throw new Error("No reservation ID found");
-  }
-
-  const vehicle = API.getVehicle(id);
-
+function Content({
+  vehicle,
+  start,
+  end,
+  quote,
+}: {
+  vehicle: Vehicle;
+  start?: string;
+  end?: string;
+  quote?: Quote;
+}) {
   if (!start || !end) {
     return (
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
@@ -253,12 +250,6 @@ function Content() {
 
   const startDate = new Date(start);
   const endDate = new Date(end);
-
-  const quote = API.getQuote({
-    vehicleId: id,
-    startTime: startDate.toISOString(),
-    endTime: endDate.toISOString(),
-  });
 
   const formattedDuration = formatDuration(
     intervalToDuration({
@@ -283,13 +274,23 @@ function Content() {
       <PriceBreakdown
         hourlyRateCents={vehicle.hourly_rate_cents}
         duration={formattedDuration}
-        totalPriceCents={quote.totalPriceCents}
+        totalPriceCents={quote?.totalPriceCents}
       />
     </div>
   );
 }
 
-export function ReviewPage() {
+export function ReviewPage({
+  vehicle,
+  start,
+  end,
+  quote,
+}: {
+  vehicle: Vehicle;
+  start?: string;
+  end?: string;
+  quote?: Quote;
+}) {
   return (
     <MiniPageLayout
       title="Almost there"
@@ -298,9 +299,7 @@ export function ReviewPage() {
       <ErrorBoundary
         fallback={<ErrorFallback message="Failed to load reservation" />}
       >
-        <Suspense fallback={null}>
-          <Content />
-        </Suspense>
+        <Content vehicle={vehicle} start={start} end={end} quote={quote} />
       </ErrorBoundary>
     </MiniPageLayout>
   );
