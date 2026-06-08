@@ -48,6 +48,16 @@ export interface VehicleSearchResult extends Vehicle {
   quote?: Quote;
 }
 
+export type AddOnPriceModel = "per_rental" | "per_day";
+
+export interface AddOn {
+  id: string;
+  name: string;
+  description: string;
+  priceCents: number;
+  priceModel: AddOnPriceModel;
+}
+
 export type PriceFilter = "all" | "under-50" | "under-75" | "under-125";
 
 export type VehicleClassFilter = Classification | "all";
