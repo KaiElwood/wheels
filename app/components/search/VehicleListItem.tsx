@@ -1,5 +1,7 @@
+"use client";
+
 import { formatCents } from "@/lib/formatters";
-import { Vehicle } from "@/server/data";
+import type { Vehicle } from "@/server/types";
 import { useBase64Image } from "@/util/useBase64Image";
 import { BadgePercent, Car, DoorOpen, Users } from "lucide-react";
 import Link from "next/link";

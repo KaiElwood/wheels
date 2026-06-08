@@ -21,6 +21,7 @@ import {
   Users,
 } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
+import type { Vehicle } from "@/server/types";
 
 function FieldLabel({
   children,
@@ -104,7 +105,7 @@ function SearchFilters() {
   );
 }
 
-export function SearchPage() {
+export function SearchPage({ vehicles }: { vehicles: Vehicle[] }) {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
@@ -149,7 +150,7 @@ export function SearchPage() {
           <ErrorBoundary
             fallback={<ErrorFallback message="Failed to load vehicles" />}
           >
-            <VehicleList />
+            <VehicleList vehicles={vehicles} />
           </ErrorBoundary>
         </section>
       </div>
