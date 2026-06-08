@@ -9,7 +9,7 @@ import { ErrorFallback } from "@/components/shared/ErrorFallback";
 import type {
   AvailabilityDay,
   SearchFilterState,
-  Vehicle,
+  VehicleSearchResult,
 } from "@/server/types";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -20,7 +20,7 @@ export function SearchPage({
 }: {
   availability: AvailabilityDay[];
   filters: SearchFilterState;
-  vehicles: Vehicle[];
+  vehicles: VehicleSearchResult[];
 }) {
   const reviewRange = getReviewRange(filters);
 

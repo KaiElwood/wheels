@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCents } from "@/lib/formatters";
-import type { Vehicle } from "@/server/types";
+import type { VehicleSearchResult } from "@/server/types";
 import { useBase64Image } from "@/util/useBase64Image";
 import { BadgePercent, Car, DoorOpen, Users } from "lucide-react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { Button } from "../shared/ui/button";
 import { Card } from "../shared/ui/card";
 
 interface VehicleListItemProps {
-  vehicle: Vehicle;
+  vehicle: VehicleSearchResult;
   reviewRange?: {
     start: string;
     end: string;
@@ -18,6 +18,8 @@ interface VehicleListItemProps {
 
 export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) {
   const imgData = useBase64Image(vehicle.thumbnail_url);
+  const quote = vehicle.quote;
+  const discount = quote?.discount;
   const specs = [
     { label: "Class", value: vehicle.classification, icon: Car },
     { label: "Seats", value: vehicle.max_passengers, icon: Users },
@@ -49,10 +51,12 @@ export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) 
           ) : (
             <div className="h-full w-full animate-pulse bg-muted" />
           )}
-          <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-white/95 px-2.5 py-1 text-xs font-semibold text-primary shadow-sm">
-            <BadgePercent className="h-3.5 w-3.5" />
-            Save up to 17%
-          </div>
+          {discount ? (
+            <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-white/95 px-2.5 py-1 text-xs font-semibold text-primary shadow-sm">
+              <BadgePercent className="h-3.5 w-3.5" />
+              {discount.badgeLabel}
+            </div>
+          ) : null}
         </div>
         <div className="flex flex-1 flex-col gap-5 p-5">
           <div className="space-y-1">
@@ -79,13 +83,33 @@ export function VehicleListItem({ reviewRange, vehicle }: VehicleListItemProps) 
             ))}
           </dl>
 
-          <div className="mt-auto flex items-center justify-between gap-4 border-t pt-4">
-            <p className="text-2xl font-semibold text-foreground">
-              {formatCents(vehicle.hourly_rate_cents)}
-              <span className="text-sm font-medium text-muted-foreground">
-                /hr
-              </span>
-            </p>
+          <div className="mt-auto flex items-end justify-between gap-4 border-t pt-4">
+            <div className="min-w-0">
+              <p className="text-2xl font-semibold text-foreground">
+                {quote
+                  ? formatCents(quote.totalPriceCents)
+                  : formatCents(vehicle.hourly_rate_cents)}
+                <span className="text-sm font-medium text-muted-foreground">
+                  {quote ? "/trip" : "/hr"}
+                </span>
+              </p>
+              {quote ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {discount ? (
+                    <>
+                      <span className="line-through">
+                        {formatCents(quote.baseTotalPriceCents)}
+                      </span>{" "}
+                      <span className="font-medium text-primary">
+                        save {formatCents(discount.amountOffCents)}
+                      </span>
+                    </>
+                  ) : (
+                    `${formatCents(vehicle.hourly_rate_cents)}/hr base`
+                  )}
+                </p>
+              ) : null}
+            </div>
             <Button asChild>
               <Link href={reviewHref}>Book now</Link>
             </Button>

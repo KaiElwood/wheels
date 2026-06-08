@@ -1,9 +1,9 @@
-import type { Vehicle } from "@/server/types";
+import type { VehicleSearchResult } from "@/server/types";
 import { Card } from "../shared/ui/card";
 import { VehicleListItem } from "./VehicleListItem";
 
 interface VehicleListProps {
-  vehicles: Vehicle[];
+  vehicles: VehicleSearchResult[];
   reviewRange?: {
     start: string;
     end: string;

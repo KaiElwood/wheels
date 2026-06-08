@@ -167,12 +167,14 @@ function AddOnsPanel() {
 function PriceBreakdown({
   hourlyRateCents,
   duration,
-  totalPriceCents,
+  quote,
 }: {
   hourlyRateCents: number;
   duration?: string;
-  totalPriceCents?: number;
+  quote?: Quote;
 }) {
+  const totalPriceCents = quote?.totalPriceCents;
+
   return (
     <Card className="p-6 shadow-sm lg:sticky lg:top-8">
       <div className="space-y-5">
@@ -198,6 +200,22 @@ function PriceBreakdown({
               {duration || "Pending"}
             </dd>
           </div>
+          {quote ? (
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-muted-foreground">Base rental</dt>
+              <dd className="font-medium text-foreground">
+                {formatCents(quote.baseTotalPriceCents)}
+              </dd>
+            </div>
+          ) : null}
+          {quote?.discount ? (
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-muted-foreground">{quote.discount.label}</dt>
+              <dd className="font-medium text-primary">
+                -{formatCents(quote.discount.amountOffCents)}
+              </dd>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between gap-4">
             <dt className="text-muted-foreground">Add-ons</dt>
             <dd className="font-medium text-foreground">$0</dd>
@@ -274,7 +292,7 @@ function Content({
       <PriceBreakdown
         hourlyRateCents={vehicle.hourly_rate_cents}
         duration={formattedDuration}
-        totalPriceCents={quote?.totalPriceCents}
+        quote={quote}
       />
     </div>
   );
