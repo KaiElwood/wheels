@@ -243,10 +243,10 @@ function DatePickerField({
       </Popover>
       <Select value={time} onValueChange={onTimeChange}>
         <SelectTrigger aria-label={`${label} hour`}>
-          <span className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <Clock3 className="h-4 w-4 shrink-0 text-primary" />
             <SelectValue />
-          </span>
+          </div>
         </SelectTrigger>
         <SelectContent>
           {HOUR_OPTIONS.map((option) => (
